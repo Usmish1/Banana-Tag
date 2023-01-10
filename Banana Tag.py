@@ -38,6 +38,7 @@ character2 = pg.image.load("character2.png")
 speed_item = pg.image.load("speeditem.png")
 speed_move = pg.image.load("speedmove.png")
 wall = pg.image.load("wall_block.png")
+continue_button_img = pg.image.load("continue_button.png")
 
 #image rectangles
 character_rect1 = pg.Rect((50,150), character1.get_size())
@@ -64,11 +65,36 @@ if rng == 2:
     tagged_1 = False
     tagged_2 = True
 
+# image classes:
 
- l
-
+class button():
+    def __init__(self, x, y, image, scale):
+        width = image.get_width()
+        height = image.get_height()
+        self.image = pg.transform.scale(image, (int(width*scale), int(height*scale)))
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        self.clicked = False
+        
+    def draw(self):
+        action = False
+        pos = pg.mouse.get_pos()
+        if self.rect.collidepoint(pos):
+            if pg.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                self.clicked = True
+                action = True
+                
+        if pg.mouse.get_pressed()[0] == 0:
+            self.clicked = False
+        
+        screen.blit(self.image, (self.rect.x, self.rect.y))
+        
+        return action
 
 class game():
+    
+    def __init__(self):
+        print("game initiated")
     
     #showing things
     def blit_images():
@@ -145,16 +171,13 @@ class game():
         if tagged_2:
             screen.blit(character_tag2, character_tag_rect2)
 
-        print(keys_pressed[pg.K_SPACE], tag_countdown, tagged_1)
         if keys_pressed[pg.K_SPACE] == 1 and tag_countdown == -300 and tagged_1:
             tag_countdown = 180
-            print("1 trying to tag")
             if check_tag(1):
                 tagged_1 = False
                 tagged_2 = True
         if keys_pressed[pg.K_KP_0] == 1 and tag_countdown2 == -300 and tagged_2:
             tag_countdown2 = 180
-            print("2 trying to tag")
             if check_tag(2):
                 tagged_1 = True
                 tagged_2 = False
@@ -169,11 +192,9 @@ class game():
         def check_tag(player):
             if player == 1:
                 if character_rect1.colliderect(character_rect2):
-                    print("1 colliding with 2")
                     return True
             if player == 2:
                 if character_rect2.colliderect(character_rect1):
-                    print("2 colliding with 1")
                     return True
                 
     def show_text():
@@ -183,30 +204,21 @@ class game():
         global text1Rect
         global text2
         global text2Rect
-        font = pg.font.Font('freesansbold.ttf', 32)
         if tagged_1 == True and tag_countdown == -300:
-            # text1 = "Blue is tagged \n TAG AVAILABLE"
-            # text2 = ''
-            textbox_1 = font.render("Blue is tagged \n TAG AVAILABLE", True, green, (50, 50, 50))
-            textbox_2 = font.render("", True, green, (150, 50, 50))
+            text1 = "Blue is tagged \n TAG AVAILABLE"
+            text2 = ''
         if tagged_1 == True and tag_countdown != -300:
-            # text1 = "Blue is tagged \n TAG ON COOLDOWN"
-            # text2 = ''
-            textbox_1 = font.render("", True, green, (50, 50, 50))
-            textbox_2 = font.render("Blue is tagged \n TAG ON COOLDOWN", True, green, (150, 50, 50))
+            text1 = "Blue is tagged\nTAG ON COOLDOWN"
+            text2 = ''
         if tagged_2 == True and tag_countdown2 == -300:
-            # text2 = "Red is tagged \n TAG AVAILABLE"
-            # text1 = ''
-            textbox_1 = font.render("", True, green, (50, 50, 50))
-            textbox_2 = font.render("Red is tagged \n TAG AVAILABLE", True, green, (150, 50, 50))
+            text2 = "Red is tagged \n TAG AVAILABLE"
+            text1 = ''
         if tagged_2 == True and tag_countdown2 != -300:
-            # text2 = "Red is tagged \n TAG ON COOLDOWN"
-            # text1 = ''
-            textbox_1 = font.render("", True, green, (50, 50, 50))
-            textbox_2 = font.render("Red is tagged \n TAG ON COOLDOWN", True, green, (150, 50, 50))
-        font = pg.font.Font('freesansbold.ttf', 32)
-        #textbox_1 = font.render(f"{text1}", True, green, (50, 50, 50))
-        #textbox_2 = font.render(f"{text2}", True, green, (150, 50, 50))
+            text2 = "Red is tagged \n TAG ON COOLDOWN"
+            text1 = ''
+        font = pg.font.Font('freesansbold.ttf', 20)
+        textbox_1 = font.render(f"{text1}", True, green, (50, 50, 50))
+        textbox_2 = font.render(f"{text2}", True, green, (150, 50, 50))
         text1Rect = textbox_1.get_rect()
         text1Rect.center = (175, 45)
         text2Rect = textbox_2.get_rect()
@@ -245,24 +257,41 @@ class game():
             x = 0
             for column in row:
                 if column == 1:
-                    #block = pg.Rect(x, y, screenx/8, screeny/6)
-                    #pg.draw.rect(screen, (0, 64, 64), block)
-                    wall_rect.x = x
-                    wall_rect.y = y
-                    screen.blit(wall, wall_rect)
+                    block = pg.Rect(x, y, screenx/8, screeny/6)
+                    pg.draw.rect(screen, (0, 64, 64), block)
+                    # wall_rect.x = x
+                    # wall_rect.y = y
+                    # screen.blit(wall, wall_rect)
 
             x += 50
         y += 50
+        
+    def pause_menu():
+        print("Pausing Game")
+        clock = pg.time.Clock()
+        paused = True
+        while paused:
+            screen.fill(white)
+            continue_button = button(400, 200, continue_button_img, 2)
+            if continue_button.draw():
+                break
+            clock.tick(FPS)
+            pg.display.update()
+            for e in pg.event.get():
+                if e.type == pg.QUIT:
+                    pg.quit()
+                    sys.exit()
+            
         
     #game loop
     clock = pg.time.Clock()
     while True:
         #limit fps
         clock.tick(FPS)
+        #deltatime = clock.tick(FPS)/1000 #will be used to balance movement across devices if they arent able to meet the 60 fps (unlikely?)
         
         global tag_countdown
         global tag_countdown2
-        print(tag_countdown, tag_countdown2)
         # countdown remover
         if tag_countdown > -300:
             tag_countdown -= 1
@@ -276,11 +305,15 @@ class game():
         blit_images()
 
         #level
-        #level_builder()
+        level_builder()
 
+        
+        
         #random number gen to randomly chose when speed boost will spawn
-        speed_chance = random.randint(1, 5000)
-        if speed_chance == 1234 and not speed_item_active and frame > 2500:
+        spawn_chance = 5000
+        start_rng = 600 # the amount of frames before the speed boost will spawn
+        speed_chance = random.randint(1, spawn_chance)
+        if speed_chance == 1234 and not speed_item_active and frame > start_rng:
             print("Number Guessed")
             speed_spawn()
         if speed_item_active:
@@ -294,6 +327,10 @@ class game():
         #tagging system
         tag()
         
+        #pause menu
+        if keys_pressed[pg.K_p] == 1:
+            pause_menu()
+        
         frame += 1
         if frame % 100 == 0:
             print(f"Frames Generated: {frame}")
@@ -305,5 +342,3 @@ class game():
             if e.type == pg.QUIT:
                 pg.quit()
                 sys.exit()
-        
-        
