@@ -289,8 +289,7 @@ class game():
     clock = pg.time.Clock()
     while True:
         #limit fps
-        clock.tick(FPS)
-        #deltatime = clock.tick(FPS)/1000 #will be used to balance movement across devices if they arent able to meet the 60 fps (unlikely?)
+        clock.tick(FPS) # limits the frames per second to 60 which is easy to run for all computers
         
         global tag_countdown
         global tag_countdown2
