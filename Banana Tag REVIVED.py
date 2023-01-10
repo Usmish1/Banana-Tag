@@ -67,6 +67,10 @@ if rng == 2:
 
 # image classes:
 
+def test(word):
+    print(word) #this was used to test throughout coding. It would simply print out whatever you wanted in specific locations
+
+
 class button():
     def __init__(self, x, y, image, scale):
         width = image.get_width()
