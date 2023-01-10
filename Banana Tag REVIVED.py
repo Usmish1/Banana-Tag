@@ -118,15 +118,15 @@ class game():
             speed = 5
             
         # screen continuation
-        if character_rect1.x == 749:
+        if character_rect1.x > 749:
             character_rect1.x = 1
-        if character_rect1.x == 0:
+        if character_rect1.x < 0:
             character_rect1.x = 748
 
-        if keys_pressed[pg.K_a] == 1 and character_rect1.x > 0:
+        if keys_pressed[pg.K_a] == 1:
             character_rect1.x -= speed
 
-        if keys_pressed[pg.K_d] == 1 and character_rect1.x < 750:
+        if keys_pressed[pg.K_d] == 1:
             character_rect1.x += speed
 
         if keys_pressed[pg.K_w] == 1 and character_rect1.y > 0:
@@ -144,15 +144,15 @@ class game():
             speed = 5
             
             #screen continuation
-        if character_rect2.x == 749:
+        if character_rect2.x > 749:
             character_rect2.x = 1
-        if character_rect2.x == 0:
+        if character_rect2.x < 0:
             character_rect2.x = 748
 
-        if keys_pressed[pg.K_LEFT] == 1 and character_rect2.x > 0:
+        if keys_pressed[pg.K_LEFT] == 1:
             character_rect2.x -= speed
 
-        if keys_pressed[pg.K_RIGHT] == 1 and character_rect2.x < 750:
+        if keys_pressed[pg.K_RIGHT] == 1:
             character_rect2.x += speed
 
         if keys_pressed[pg.K_UP] == 1 and character_rect2.y > 0:
@@ -181,7 +181,7 @@ class game():
             if check_tag(1):
                 tagged_1 = False
                 tagged_2 = True
-        if keys_pressed[pg.K_KP_0] == 1 and tag_countdown2 == -300 and tagged_2:
+        if keys_pressed[pg.K_RSHIFT] == 1 and tag_countdown2 == -300 and tagged_2:
             tag_countdown2 = 180
             if check_tag(2):
                 tagged_1 = True
@@ -262,20 +262,31 @@ class game():
                  [0, 0, 1, 0, 0, 1, 0, 0],
                  [0, 1, 1, 1, 1, 0, 1, 0], 
                  [1, 0, 0, 0, 0, 0, 0, 1]]
+        # y = 0
+        # for row in level1:
+        #     x = 0
+        #     for column in row:
+        #         if column == 1:
+        #             block = pg.Rect(x, y, screenx/8, screeny/6)
+        #             block.x = x
+        #             block.y = y
+        #             pg.draw.rect(screen, (0, 64, 64), block)
+        #         if column == 0:
+        #             pass
+        #             x += 100
+        #             print(x, y)
+        #     y += 100
         y = 0
         for row in level1:
             x = 0
             for column in row:
                 if column == 1:
-                    block = pg.Rect(x, y, screenx/8, screeny/6)
-                    block.x = x
-                    block.y = y
-                    pg.draw.rect(screen, (0, 64, 64), block)
-                if column == 0:
-                    pass
-                    x += 100
-                    print(x, y)
-            y += 100
+                    # block = pg.Rect(x, y, screenx / 8, screeny / 6)
+                    # pg.draw.rect(screen, (0, 64, 64), block)
+                    wall_rect.topleft = 3
+
+                x += screenx / 8
+            y += screeny / 6
                     
                     
                     #screen.blit(block, (x, y))
