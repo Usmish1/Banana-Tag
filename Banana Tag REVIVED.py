@@ -347,3 +347,5 @@ class game():
             if e.type == pg.QUIT:
                 pg.quit()
                 sys.exit()
+                
+# im really just trying to figure out how to use github some pls help
