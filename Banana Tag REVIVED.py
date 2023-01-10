@@ -39,6 +39,7 @@ speed_item = pg.image.load("speeditem.png")
 speed_move = pg.image.load("speedmove.png")
 wall = pg.image.load("wall_block.png")
 continue_button_img = pg.image.load("continue_button.png")
+exit_button_img = pg.image.load("exit_button.png")
 
 #image rectangles
 character_rect1 = pg.Rect((50,150), character1.get_size())
@@ -131,7 +132,7 @@ class game():
         if keys_pressed[pg.K_w] == 1 and character_rect1.y > 0:
             character_rect1.y -= speed
 
-        if keys_pressed[pg.K_s] == 1 and character_rect1.y < 550:
+        if keys_pressed[pg.K_s] == 1 and character_rect1.bottom < 600:
             character_rect1.y += speed
             
     #character 2 movement
@@ -157,7 +158,7 @@ class game():
         if keys_pressed[pg.K_UP] == 1 and character_rect2.y > 0:
             character_rect2.y -= speed
 
-        if keys_pressed[pg.K_DOWN] == 1 and character_rect2.y < 550:
+        if keys_pressed[pg.K_DOWN] == 1 and character_rect2.bottom < 600:
             character_rect2.y += speed
             
     #tagging other player
@@ -255,17 +256,29 @@ class game():
             speed_active2 = False
             
     def level_builder():
-        level1 = [[0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0],[1, 0, 0, 1, 1, 0, 0, 0], [0, 0, 1, 0, 0, 1, 0, 0],[0, 1, 1, 1, 1, 0, 1, 0], [1, 0, 0, 0, 0, 0, 0, 1]]
+        level1 = [[0, 0, 0, 1, 0, 0, 0, 1], 
+                 [0, 0, 0, 0, 0, 0, 0, 0],
+                 [1, 0, 0, 1, 1, 0, 0, 0], 
+                 [0, 0, 1, 0, 0, 1, 0, 0],
+                 [0, 1, 1, 1, 1, 0, 1, 0], 
+                 [1, 0, 0, 0, 0, 0, 0, 1]]
         y = 0
         for row in level1:
             x = 0
             for column in row:
                 if column == 1:
                     block = pg.Rect(x, y, screenx/8, screeny/6)
+                    block.x = x
+                    block.y = y
                     pg.draw.rect(screen, (0, 64, 64), block)
-                    # wall_rect.x = x
-                    # wall_rect.y = y
-                    # screen.blit(wall, wall_rect)
+                if column == 0:
+                    pass
+                    x += 100
+                    print(x, y)
+            y += 100
+                    
+                    
+                    #screen.blit(block, (x, y))
 
             x += 50
         y += 50
@@ -277,8 +290,12 @@ class game():
         while paused:
             screen.fill(white)
             continue_button = button(400, 200, continue_button_img, 2)
+            exit_button = button(400, 400, exit_button_img, 2)
             if continue_button.draw():
                 break
+            if exit_button.draw():
+                pg.quit()
+                sys.exit()
             clock.tick(FPS)
             pg.display.update()
             for e in pg.event.get():
