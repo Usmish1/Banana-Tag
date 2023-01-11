@@ -76,7 +76,6 @@ class wall():
         self.image = image
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
-        self.rect
     
     def draw(self):
         screen.blit(self.image, (self.rect.x, self.rect.y))
@@ -105,21 +104,24 @@ class button():
         
         return action
 
+
+#MAIN GAME CLASS
 class game():
     
-    def __init__(self):
+    def __init__(self, FPS_limit):
         print("game initiated")
+        print(FPS_limit)
+        self.game_loop()
     
     #showing things
-    def blit_images():
+    def blit_images(self):
         screen.fill(green)
-        screen.blit(textbox_1, text1Rect)
-        screen.blit(textbox_2, text2Rect)
         screen.blit(character1, character_rect1)
         screen.blit(character2, character_rect2)
         
+        
     #character 1 movement
-    def char1_wasd():
+    def char1_wasd(self):
         keys_pressed = pg.key.get_pressed()
         if speed_active1:
             speed = 10
@@ -145,7 +147,7 @@ class game():
             character_rect1.y += speed
             
     #character 2 movement
-    def char2_arrows():
+    def char2_arrows(self):
         keys_pressed = pg.key.get_pressed()
         if speed_active2:
             speed = 10
@@ -167,11 +169,11 @@ class game():
         if keys_pressed[pg.K_UP] == 1 and character_rect2.y > 0:
             character_rect2.y -= speed
 
-        if keys_pressed[pg.K_DOWN] == 1 and character_rect2.bottom < 600:
+        if keys_pressed[pg.K_DOWN] == 1 and character_rect2.bottom < 600 and not character_rect2.collidepoint(wall_block.rect.topleft):
             character_rect2.y += speed
             
     #tagging other player
-    def tag():
+    def tag(self):
         global check_tag
         global tag_countdown
         global tag_countdown2
@@ -211,7 +213,7 @@ class game():
                 if character_rect2.colliderect(character_rect1):
                     return True
                 
-    def show_text():
+    def show_text(self):
         global textbox_1
         global textbox_2
         global text1
@@ -234,17 +236,19 @@ class game():
         textbox_1 = font.render(f"{text1}", True, green, (50, 50, 50))
         textbox_2 = font.render(f"{text2}", True, green, (150, 50, 50))
         text1Rect = textbox_1.get_rect()
-        text1Rect.center = (175, 45)
+        text1Rect.center = (400, 50)
         text2Rect = textbox_2.get_rect()
-        text2Rect.center = (550, 45)
+        text2Rect.center = (400, 550)       
+        screen.blit(textbox_1, text1Rect)
+        screen.blit(textbox_2, text2Rect)
         
-    def speed_spawn():
+    def speed_spawn(self):
         global speed_item_active
         speed_item_rect.x = random.randint(50,750)
         speed_item_rect.x = random.randint(50,500)
         speed_item_active = True
         
-    def speed_boost():
+    def speed_boost(self):
         global speed_active1
         global speed_active2
         global speed_end
@@ -264,47 +268,29 @@ class game():
         if speed_end == frame:
             speed_active2 = False
             
-    def level_builder():
+    def level_builder(self):
+        global wall_block
         level1 = [[0, 0, 0, 1, 0, 0, 0, 1], 
                  [0, 0, 0, 0, 0, 0, 0, 0],
                  [1, 0, 0, 1, 1, 0, 0, 0], 
                  [0, 0, 1, 0, 0, 1, 0, 0],
                  [0, 1, 1, 1, 1, 0, 1, 0], 
                  [1, 0, 0, 0, 0, 0, 0, 1]]
-        # y = 0
-        # for row in level1:
-        #     x = 0
-        #     for column in row:
-        #         if column == 1:
-        #             block = pg.Rect(x, y, screenx/8, screeny/6)
-        #             block.x = x
-        #             block.y = y
-        #             pg.draw.rect(screen, (0, 64, 64), block)
-        #         if column == 0:
-        #             pass
-        #             x += 100
-        #             print(x, y)
-        #     y += 100
         y = 0
         for row in level1:
             x = 0
             for column in row:
                 if column == 1:
-                    # block = pg.Rect(x, y, screenx / 8, screeny / 6)
-                    # pg.draw.rect(screen, (0, 64, 64), block)
                     wall_block = wall(x, y, wall_img)
                     wall_block.draw()
 
                 x += screenx / 8
             y += screeny / 6
-                    
-                    
-                    #screen.blit(block, (x, y))
 
             x += 50
         y += 50
         
-    def pause_menu():
+    def pause_menu(self):
         print("Pausing Game")
         clock = pg.time.Clock()
         paused = True
@@ -313,7 +299,7 @@ class game():
             continue_button = button(400, 200, continue_button_img, 2)
             exit_button = button(400, 400, exit_button_img, 2)
             if continue_button.draw():
-                break
+                break #resumes game loop
             if exit_button.draw():
                 pg.quit()
                 sys.exit()
@@ -324,66 +310,68 @@ class game():
                     pg.quit()
                     sys.exit()
                     
-                    #this is a github testing line
             
         
     #game loop
-    clock = pg.time.Clock()
-    while True:
-        #limit fps
-        clock.tick(FPS) # limits the frames per second to 60 which is easy to run for all computers
-        
-        global tag_countdown
-        global tag_countdown2
-        # countdown remover
-        if tag_countdown > -300:
-            tag_countdown -= 1
-        if tag_countdown2 > -300:
-            tag_countdown2 -= 1
-        
-        # show and calc text
-        show_text()
-
-        # blit characters and screen
-        blit_images()
-
-        #level
-        level_builder()
-
-        
-        
-        #random number gen to randomly chose when speed boost will spawn
-        spawn_chance = 5000
-        start_rng = 600 # the amount of frames before the speed boost will spawn
-        speed_chance = random.randint(1, spawn_chance)
-        if speed_chance == 1234 and not speed_item_active and frame > start_rng:
-            print("Number Guessed")
-            speed_spawn()
-        if speed_item_active:
-            screen.blit(speed_item, speed_item_rect)
+    def game_loop(self):
+        clock = pg.time.Clock()
+        frame = 0
+        while True:
+            #limit fps
+            clock.tick(FPS) # limits the frames per second to 60 which is easy to run for all computers
             
-        #controls
-        speed_boost()
-        char1_wasd()
-        char2_arrows()
-        
-        #tagging system
-        tag()
-        
-        #pause menu
-        if keys_pressed[pg.K_p] == 1:
-            pause_menu()
-        
-        frame += 1
-        if frame % 100 == 0:
-            print(f"Frames Generated: {frame}")
-        pg.display.update()
-        #print(clock.get_fps())
-        
-        #exit game
-        for e in pg.event.get():
-            if e.type == pg.QUIT:
-                pg.quit()
-                sys.exit()
+            
+            global tag_countdown
+            global tag_countdown2
+            # countdown remover
+            if tag_countdown > -300:
+                tag_countdown -= 1
+            if tag_countdown2 > -300:
+                tag_countdown2 -= 1
+
+            # blit characters and screen
+            self.blit_images()
+            
+            #level
+            self.level_builder()
+            
+            # show and calc text
+            self.show_text()
+
+            #random number gen to randomly chose when speed boost will spawn
+            spawn_chance = 5000
+            start_rng = 600 # the amount of frames before the speed boost will spawn
+            speed_chance = random.randint(1, spawn_chance)
+            if speed_chance == 1234 and not speed_item_active and frame > start_rng:
+                print("Number Guessed")
+                self.speed_spawn()
+            if speed_item_active:
+                screen.blit(speed_item, speed_item_rect)
                 
-# im really just trying to figure out how to use github some pls help
+            #controls
+            self.speed_boost()
+            self.char1_wasd()
+            self.char2_arrows()
+            
+            #tagging system
+            self.tag()
+            
+            #pause menu
+            if keys_pressed[pg.K_p] == 1:
+                self.pause_menu()
+            
+            frame += 1
+            if frame % 100 == 0:
+                print(f"Frames Generated: {frame}")
+                print(f"Time Elapsed: {pg.time.get_ticks()/1000} \n")
+            pg.display.update()
+            #print(clock.get_fps())
+            
+            #exit game
+            for e in pg.event.get():
+                if e.type == pg.QUIT:
+                    pg.quit()
+                    sys.exit()
+
+print("hi")
+game_class = game(60)
