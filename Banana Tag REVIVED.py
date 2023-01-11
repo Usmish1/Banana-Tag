@@ -37,7 +37,7 @@ character1 = pg.image.load("character.png")
 character2 = pg.image.load("character2.png")
 speed_item = pg.image.load("speeditem.png")
 speed_move = pg.image.load("speedmove.png")
-wall = pg.image.load("wall_block.png")
+wall_img = pg.image.load("wall_block.png")
 continue_button_img = pg.image.load("continue_button.png")
 exit_button_img = pg.image.load("exit_button.png")
 
@@ -46,7 +46,7 @@ character_rect1 = pg.Rect((50,150), character1.get_size())
 character_rect2 = pg.Rect((700,150), character2.get_size())
 speed_item_rect = pg.Rect((10000,0), speed_item.get_size())
 speed_move_rect = pg.Rect((10000, 0), speed_move.get_size())
-wall_rect = pg.Rect((1000, 0), wall.get_size())
+#wall_rect = pg.Rect((1000, 0), wall.get_size())
 
 #tagged images
 character_tag1 = pg.image.load("character_tag.png")
@@ -71,6 +71,15 @@ if rng == 2:
 def test(word):
     print(word) #this was used to test throughout coding. It would simply print out whatever you wanted in specific locations
 
+class wall():
+    def __init__(self, x, y, image):
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x, y)
+        self.rect
+    
+    def draw(self):
+        screen.blit(self.image, (self.rect.x, self.rect.y))
 
 class button():
     def __init__(self, x, y, image, scale):
@@ -283,7 +292,8 @@ class game():
                 if column == 1:
                     # block = pg.Rect(x, y, screenx / 8, screeny / 6)
                     # pg.draw.rect(screen, (0, 64, 64), block)
-                    wall_rect.topleft = 3
+                    wall_block = wall(x, y, wall_img)
+                    wall_block.draw()
 
                 x += screenx / 8
             y += screeny / 6
