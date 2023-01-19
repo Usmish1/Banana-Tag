@@ -21,7 +21,7 @@ while game_going:
     green = (0, 255, 0)
     blue = (0, 0, 128)
     red = (255, 48, 48)
-    black = ((238, 207, 161))
+    black = ((0, 0, 0))
     aqua = (174, 238, 238)
     light_blue = (176, 224, 230)
     #window name
@@ -44,6 +44,8 @@ while game_going:
     help_button = pg.image.load("assets/help_button.png")
     start_button_img = pg.image.load("assets/start_button.png")
     replay_button_img = pg.image.load("assets/replay_button.png")
+    stats_button_img = pg.image.load("assets/stats_button.png")
+    back_button_img = pg.image.load("assets/back_button.png")
     menu_background = pg.image.load("assets/menu_background.png")
 
     #image rectangles
@@ -74,23 +76,162 @@ while game_going:
     def test(word):
         print(word)  #this was used to test throughout coding. It would simply print out whatever you wanted in specific locations
 
-    #Usman
+
+    class login():
+            global player1_login
+            global player2_login
+            global players
+            global game_starter
+
+            def __init__(self):
+
+                global root
+                global frame
+                global label
+                global entry1
+                global entry2
+                global game_starter
+
+                customtkinter.set_appearance_mode("dark")
+                customtkinter.set_default_color_theme("dark-blue")
+
+                root = customtkinter.CTk()
+                root.geometry("500x350")
+
+
+
+                frame = customtkinter.CTkFrame(master=root)
+                frame.pack(pady=20, padx=60, fill="both", expand=True)
+
+                label = customtkinter.CTkLabel(master=frame, text="Login System")
+                label.pack(pady=12, padx=10)
+
+                entry1 = customtkinter.CTkEntry(master=frame, placeholder_text="Player 1 Username")
+                entry1.pack(pady=12, padx=10)
+
+                entry2 = customtkinter.CTkEntry(master=frame, placeholder_text="Player 2 Username")
+                entry2.pack(pady=12, padx=10)
+
+                button1 = customtkinter.CTkButton(master=frame, text="Login", command=self.login_press)
+                button1.pack(pady=12, padx=10)
+
+                root.mainloop()
+
+            def login_press(self):
+                global player1_login
+                global player2_login
+                global players
+                global game_starter
+                print("logging in...")
+                player1_login = entry1.get()
+                player2_login = entry2.get()
+                print(player1_login, player2_login)
+                try:                    
+                    file = open("users.txt", "r")
+                    content = file.readline().rstrip()
+                    players = ast.literal_eval(content)
+                    file.close()
+                except:
+                    pass
+                
+                
+                returning_player1 = False
+                returning_player2 = False
+                
+                #check if players already have an account
+                for username in players:
+                    
+                    #correcting 0.5 values :(
+                    if username[1] % 1 != 0:
+                        username[1] += 0.5
+                    if username[2] % 1 != 0:
+                        username[2] += 0.5
+                    if username[0] == player1_login:
+                        returning_player1 = True
+                    if username[0] == player2_login:
+                        returning_player2 = True
+                
+                #if they are not returning players, write them into file
+                if not returning_player1:
+                    temp1 = [player1_login, 0, 0]
+                    players.append(temp1)
+                if not returning_player2:
+                    temp2 = [player2_login, 0, 0]
+                    players.append(temp2)
+                
+                
+                file = open("users.txt", "w")
+                file.write(str(players))
+                file.flush()
+                file.close()
+                root.destroy()
+                main_starter = main_menu()
+                
+
+
+    #Zakariya
     class main_menu():
         def __init__(self):
-
+            global game_starter
             clock = pg.time.Clock()
             main = True
             while main:
                 screen.blit(menu_background, menu_background_rect)
                 start_button = button(400, 200, start_button_img, 0.4)
+                stats_button = button(400, 300, stats_button_img, 0.4)
                 finish_button = button(400, 400, finish_button_img, 0.3)
                 if start_button.draw():
-                    game_thing = game(60)
+                    game_starter = game()
+                if stats_button.draw():
+                    stats_menu()
                 if finish_button.draw():
                     pg.quit()
                     sys.exit()
                 clock.tick(60)
                 pg.display.update()
+                for e in pg.event.get():
+                    if e.type == pg.QUIT:
+                        pg.quit()
+                        sys.exit()
+                if restarting:
+                    break
+    
+    class stats_menu():
+        def __init__(self):
+            print("opening stats menu")
+            clock = pg.time.Clock()
+            
+            #finding stats for current players
+            for username in players:
+                if username[0] == player1_login:
+                    player1_wins = int(username[1])
+                    player1_losses = int(username[2])
+                    player1_total = player1_wins + player1_losses
+                if username[0] == player2_login:
+                    player2_wins = int(username[1])
+                    player2_losses = int(username[2])
+                    player2_total = player2_wins + player2_losses
+
+            while True:
+                screen.fill(aqua)
+                
+                #return button
+                back_button = button(100, 500, back_button_img, 0.4)
+                if back_button.draw():
+                    break
+                
+                font = pg.font.Font("freesansbold.ttf", 20)
+                stats1_tbox = font.render(f"Username: {player1_login} | Wins: {player1_wins} | Losses: {player1_losses} | Games Played: {player1_total}", True, black)
+                stats2_tbox = font.render(f"Username: {player2_login} | Wins: {player2_wins} | Losses: {player2_losses} | Games Played: {player2_total}", True, black)
+                
+                stats1_rect = stats1_tbox.get_rect()
+                stats2_rect = stats2_tbox.get_rect()
+                stats1_rect.center = (400, 200)
+                stats2_rect.center = (400, 400)
+                screen.blit(stats1_tbox, stats1_rect)
+                screen.blit(stats2_tbox, stats2_rect)
+                pg.display.update()
+                
                 for e in pg.event.get():
                     if e.type == pg.QUIT:
                         pg.quit()
@@ -153,8 +294,8 @@ while game_going:
 
     #MAIN GAME CLASS
     class game():
-        #usnam
-        def __init__(self, FPS_limit): 
+        #usman
+        def __init__(self): 
             global tagged_1
             global tagged_2
             global time_left
@@ -177,7 +318,6 @@ while game_going:
             global restarting
 
             print("game initiated")
-            print(FPS_limit)
         
             #Omar
             #see which player starts with the banana
@@ -210,82 +350,10 @@ while game_going:
             restarting = False
 
             #start game
-            print("starting login screen")
-            self.login()
+            print("starting game")
+            self.game_loop()
 
-        def login(self):
-            global player1_login
-            global player2_login
-            global players
-            customtkinter.set_appearance_mode("dark")
-            customtkinter.set_default_color_theme("dark-blue")
-
-            root = customtkinter.CTk()
-            root.geometry("500x350")
-
-            def login_press():
-                global player1_login
-                global player2_login
-                global players
-                print("logging in...")
-                player1_login = entry1.get()
-                player2_login = entry2.get()
-                print(player1_login, player2_login)
-                file = open("users.txt", "r")
-                content = file.readline().rstrip()
-                players = ast.literal_eval(content)
-                file.close()
-                
-                returning_player1 = False
-                returning_player2 = False
-                
-                #check if players already have an account
-                for username in players:
-                    
-                    #correcting 0.5 values :(
-                    if username[1] % 1 != 0:
-                        username[1] += 0.5
-                    if username[2] % 1 != 0:
-                        username[2] += 0.5
-                    if username[0] == player1_login:
-                        returning_player1 = True
-                    if username[0] == player2_login:
-                        returning_player2 = True
-                
-                #if they are not returning players, write them into file
-                if not returning_player1:
-                    temp1 = [player1_login, 0, 0]
-                    players.append(temp1)
-                if not returning_player2:
-                    temp2 = [player2_login, 0, 0]
-                    players.append(temp2)
-                
-                
-                file = open("users.txt", "w")
-                file.write(str(players))
-                file.flush()
-                file.close()
-                root.destroy()
-                self.game_loop()
-
-
-            frame = customtkinter.CTkFrame(master=root)
-            frame.pack(pady=20, padx=60, fill="both", expand=True)
-
-            label = customtkinter.CTkLabel(master=frame, text="Login System")
-            label.pack(pady=12, padx=10)
-
-            entry1 = customtkinter.CTkEntry(master=frame, placeholder_text="Player 1 Username")
-            entry1.pack(pady=12, padx=10)
-
-            entry2 = customtkinter.CTkEntry(master=frame, placeholder_text="Player 2 Username")
-            entry2.pack(pady=12, padx=10)
-
-            button = customtkinter.CTkButton(master=frame, text="Login", command=login_press)
-            button.pack(pady=12, padx=10)
-
-            root.mainloop()
-
+        
     #Omar
     #showing things
 
@@ -426,7 +494,7 @@ while game_going:
                 text1 = ''
 
         #Zakariya
-            time_left = 15 - time
+            time_left = 45 - time
             if time_left > 10:
                 time_left = round(time_left, 0)
                 time_left = int(time_left)
@@ -435,19 +503,27 @@ while game_going:
 
             font = pg.font.Font('freesansbold.ttf', 20)
             timer_font = pg.font.Font('freesansbold.ttf', 40)
-            textbox_1 = font.render(f"{text1}", True, green, (50, 50, 50))
-            textbox_2 = font.render(f"{text2}", True, green, (150, 50, 50))
-            timerbox = timer_font.render(f"{time_left}", True, green,
-                                        (50, 50, 50))  #timer
+            name_font = pg.font.Font('freesansbold.ttf', 15)
+            textbox_1 = font.render(f"{text1}", True, green)
+            textbox_2 = font.render(f"{text2}", True, green)
+            timerbox = timer_font.render(f"{time_left}", True, green)  #timer
+            char1_name = name_font.render(f"{player1_login}", True, black) #player
+            char2_name = name_font.render(f"{player2_login}", True, black) #player
             text1Rect = textbox_1.get_rect()
             text1Rect.center = (400, 50)
             text2Rect = textbox_2.get_rect()
             text2Rect.center = (400, 50)
             timer_rect = timerbox.get_rect()  #timer
             timer_rect.center = (400, 550)  #timer
+            char1_name_rect = char1_name.get_rect()
+            char1_name_rect.center = (character_rect1.x, character_rect1.y-15)
+            char2_name_rect = char2_name.get_rect()
+            char2_name_rect.center = (character_rect2.x, character_rect2.y-15)
             screen.blit(textbox_1, text1Rect)
             screen.blit(textbox_2, text2Rect)
             screen.blit(timerbox, timer_rect)
+            screen.blit(char1_name, char1_name_rect)
+            screen.blit(char2_name, char2_name_rect)
     #Omar
 
         def speed_spawn(self):
@@ -564,7 +640,8 @@ while game_going:
                     if e.type == pg.QUIT:
                         pg.quit()
                         sys.exit()
-
+    
+                
         #Zakariya
         def end_game(self, type, activator):
             global time
@@ -717,13 +794,13 @@ while game_going:
                 if frame % 100 == 0:
                     print(f"Frames Generated: {frame}")
                     print(f"Time Elapsed: {time} \n")
-                    print(players)
                 pg.display.update()
                 #print(clock.get_fps())
 
                 #game controller
                 self.game_controller()
                 
+                #breaks out of game loop and restarts game
                 if restarting == True:
                     break
 
@@ -735,5 +812,5 @@ while game_going:
                         sys.exit()
                         
     print("very big loop")              
-    main_thing = main_menu()
+    login_starter = login()
     # game_class = game(60)
