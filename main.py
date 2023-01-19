@@ -4,6 +4,7 @@ while game_going:
     import sys
     import random
     import customtkinter
+    import ast
 
     #initiating pygame
     pg.init()
@@ -35,7 +36,7 @@ while game_going:
     character1 = pg.image.load("assets/character.png")
     character2 = pg.image.load("assets/character2.png")
     speed_item = pg.image.load("assets/speeditem.png")
-    lava_img = pg.image.load("assets/wall_block.png")
+    lava_img = pg.image.load("assets/lava.png")
     resume_button_img = pg.image.load("assets/resume_button.png")
     finish_button_img = pg.image.load("assets/finish_button.png")
     grass_background = pg.image.load("assets/grass_background.png")
@@ -213,6 +214,9 @@ while game_going:
             self.login()
 
         def login(self):
+            global player1_login
+            global player2_login
+            global players
             customtkinter.set_appearance_mode("dark")
             customtkinter.set_default_color_theme("dark-blue")
 
@@ -220,13 +224,47 @@ while game_going:
             root.geometry("500x350")
 
             def login_press():
+                global player1_login
+                global player2_login
+                global players
                 print("logging in...")
                 player1_login = entry1.get()
                 player2_login = entry2.get()
-                temp1 = [player1_login, 0, 0]
-                temp2 = [player2_login, 0, 0]
-                players.append(temp1)
-                players.append(temp2)
+                print(player1_login, player2_login)
+                file = open("users.txt", "r")
+                content = file.readline().rstrip()
+                players = ast.literal_eval(content)
+                file.close()
+                
+                returning_player1 = False
+                returning_player2 = False
+                
+                #check if players already have an account
+                for username in players:
+                    
+                    #correcting 0.5 values :(
+                    if username[1] % 1 != 0:
+                        username[1] += 0.5
+                    if username[2] % 1 != 0:
+                        username[2] += 0.5
+                    if username[0] == player1_login:
+                        returning_player1 = True
+                    if username[0] == player2_login:
+                        returning_player2 = True
+                
+                #if they are not returning players, write them into file
+                if not returning_player1:
+                    temp1 = [player1_login, 0, 0]
+                    players.append(temp1)
+                if not returning_player2:
+                    temp2 = [player2_login, 0, 0]
+                    players.append(temp2)
+                
+                
+                file = open("users.txt", "w")
+                file.write(str(players))
+                file.flush()
+                file.close()
                 root.destroy()
                 self.game_loop()
 
@@ -535,25 +573,51 @@ while game_going:
             global restarting
             clock = pg.time.Clock()
             end = True
+            file = open("users.txt", "w")
+            saved = False
             while end:
                 screen.blit(menu_background, menu_background_rect)
                 font = pg.font.SysFont("comicsansms", 72)
 
                 if type == "time":
                     if tagged_1:
-                        end_winner = font.render("Red has won", True, red,
-                                                (50, 50, 50))
+                        end_winner = font.render("Red has won", True, red,(50, 50, 50))
+                        winner = 2
                     if tagged_2:
-                        end_winner = font.render("Blue has won", True, light_blue,
-                                                (50, 50, 50))
+                        end_winner = font.render("Blue has won", True, light_blue,(50, 50, 50))
+                        winner = 1
 
                 if type == "lava":
                     if activator == 1:
-                        end_winner = font.render("Red has won", True, red,
-                                                (50, 50, 50))
+                        end_winner = font.render("Red has won", True, red,(50, 50, 50))
+                        winner = 2
                     if activator == 2:
-                        end_winner = font.render("Blue has won", True, light_blue,
-                                                (50, 50, 50))
+                        end_winner = font.render("Blue has won", True, light_blue,(50, 50, 50))
+                        winner = 1
+                if not saved and winner == 1:
+                    
+                #adding to wins or losses (only adding 0.5 cause for some reason it runs it twice)
+                    for username in players:
+                        if username[0] == player1_login:
+                            username[1] += 0.5
+                        if username[0] == player2_login:
+                            username[2] += 0.5
+                    file.write(str(players))
+                    file.flush()
+                    file.close()                  
+                    saved = True
+                    
+                if not saved and winner == 2:
+                    for username in players:
+                        if username[0] == player2_login:
+                            username[1] += 0.5
+                        if username[0] == player1_login:
+                            username[2] += 0.5
+                    file.write(str(players))
+                    file.flush()
+                    file.close()
+                    saved = True
+                
                     time = 0
                     time_left = 60
                     timer = 0
@@ -578,27 +642,6 @@ while game_going:
                     if e.type == pg.QUIT:
                         pg.quit()
                         sys.exit()
-        
-        #Zakariya
-        # def main_menu(self):
-
-        #     clock = pg.time.Clock()
-        #     main = True
-        #     while main:
-        #         screen.blit(menu_background, menu_background_rect)
-        #         start_button = button(400, 200, start_button_img, 0.4)
-        #         finish_button = button(400, 400, finish_button_img, 0.3)
-        #         if start_button.draw():
-        #             self.game_loop()
-        #         if finish_button.draw():
-        #             pg.quit()
-        #             sys.exit()
-        #         clock.tick(FPS)
-        #         pg.display.update()
-        #         for e in pg.event.get():
-        #             if e.type == pg.QUIT:
-        #                 pg.quit()
-        #                 sys.exit()
 
         #Usman
         #game loop
