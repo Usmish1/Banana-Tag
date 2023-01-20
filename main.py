@@ -76,8 +76,8 @@ while game_going:
     def test(word):
         print(word)  #this was used to test throughout coding. It would simply print out whatever you wanted in specific locations
 
-
-    class login():
+    #Usman
+    class login(): #login function to store player stats
             global player1_login
             global player2_login
             global players
@@ -117,7 +117,8 @@ while game_going:
 
                 root.mainloop()
 
-            def login_press(self):
+            #Usman
+            def login_press(self): #login button 
                 global player1_login
                 global player2_login
                 global players
@@ -170,7 +171,7 @@ while game_going:
 
 
     #Zakariya
-    class main_menu():
+    class main_menu(): #start menu with starting, stats, and finish button
         def __init__(self):
             global game_starter
             clock = pg.time.Clock()
@@ -195,8 +196,8 @@ while game_going:
                         sys.exit()
                 if restarting:
                     break
-    
-    class stats_menu():
+    #Zakariya
+    class stats_menu(): #menu that shows wins, losses, total games played
         def __init__(self):
             print("opening stats menu")
             clock = pg.time.Clock()
@@ -240,8 +241,7 @@ while game_going:
                     break
 
     #usman
-    class lava():
-
+    class lava(): #function to make lava blocks with the level builder
         def __init__(self, x, y, image):
             self.image = image
             self.rect = self.image.get_rect()
@@ -249,19 +249,6 @@ while game_going:
 
         def draw(self):
             screen.blit(self.image, (self.rect.x, self.rect.y))
-
-        def check_bottom(self, player):
-            colliding = False
-            if self.rect.collidepoint(player.bottomleft):
-                colliding = True
-            print(colliding)
-            return colliding
-
-        def check_top(self, player):
-            colliding = False
-            if self.rect.collidepoint(player.topleft):
-                colliding = True
-            return colliding
 
 
     #Zakariya
@@ -363,9 +350,7 @@ while game_going:
             screen.blit(character2, character_rect2)
 
         #Usman
-
         #character 1 movement
-
         def char1_wasd(self):
             keys_pressed = pg.key.get_pressed()
             if speed_active1:
@@ -396,7 +381,6 @@ while game_going:
                 character_rect1.y += speed
     #Usman
     #character 2 movement
-
         def char2_arrows(self):
             keys_pressed = pg.key.get_pressed()
             if speed_active2:
@@ -590,9 +574,12 @@ while game_going:
 
             global char1_bottom
             self.lava_list = []
-            level1 = [[0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0],
-                    [0, 0, 0, 1, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 1, 0, 0]]
+            level1 = [[0, 0, 0, 0, 0, 0, 0, 0], 
+                      [0, 1, 0, 0, 0, 0, 1, 0],
+                      [0, 0, 0, 0, 0, 0, 0, 0], 
+                      [0, 0, 0, 0, 0, 0, 0, 0],
+                      [0, 1, 0, 0, 0, 0, 1, 0], 
+                      [0, 0, 0, 0, 0, 0, 0, 0]]
             y = 0
             for row in level1:
                 x = 0
